@@ -3,12 +3,18 @@
  */
 package net.reusingthewheel.languageGeneratorFramework
 
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
+import org.assertj.core.api.Assertions.*
 
-class LibraryTest {
-    @Test fun testSomeLibraryMethod() {
-        val classUnderTest = Library()
-        assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod should return 'true'")
+object LibrarySpec: Spek({
+    describe("A library") {
+        val classUnderTest by memoized { Library() }
+
+        describe("someLibraryMethod") {
+            it("returns 'true'") {
+                assertThat(classUnderTest.someLibraryMethod()).isEqualTo(true)
+            }
+        }
     }
-}
+})

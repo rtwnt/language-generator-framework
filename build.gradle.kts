@@ -33,4 +33,14 @@ dependencies {
 
     // spek requires kotlin-reflect, can be omitted if already in the classpath
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+
+    testImplementation("org.assertj:assertj-core:3.17.2")
+}
+
+tasks {
+    test {
+        useJUnitPlatform {
+            includeEngines("spek2")
+        }
+    }
 }
