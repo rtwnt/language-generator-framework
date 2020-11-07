@@ -4,7 +4,7 @@ package net.reusingthewheel.languageGeneratorFramework.soundChange
 /**
  * A nondeterministic finite state automaton
  */
-class NFA private constructor(private val start: State, private val end: State) {
+class NFA private constructor(private val start: State, private val end: EpsilonTransitionState) {
 
     /**
      * Get the subsequence of given sequence of symbols starting from the beginning of given sequence
@@ -16,44 +16,7 @@ class NFA private constructor(private val start: State, private val end: State) 
      */
     fun getMatchingPrefix(symbols: List<String>): MatchResult {
         require(symbols.isNotEmpty()) { "A sequence of symbols cannot be empty" }
-        return getMatchingPrefix(symbols, start)
-    }
-
-    private fun getMatchingPrefix(symbols: List<String>, currentState: State): MatchResult {
-        val result = MatchResult()
-        if (currentState.isFinal) {
-            result.isMatchDetected = true
-            return result
-        }
-
-        val allMatchResults = mutableListOf<MatchResult>()
-        allMatchResults.add(getMatchingPrefixByConsumingSymbol(symbols, currentState))
-        allMatchResults.addAll(
-                getAllMatchResultsFromEmptySymbolTransition(symbols, currentState)
-        )
-        return allMatchResults
-                .filter(MatchResult::isMatchDetected)
-                .maxByOrNull { it.matchedSymbols.size } ?: result
-    }
-
-    private fun getMatchingPrefixByConsumingSymbol(symbols: List<String>, currentState: State): MatchResult {
-        var nextResult = MatchResult()
-        if (symbols.isEmpty()) {
-            return nextResult
-        }
-        val currentSymbol = symbols[0]
-        val nextState = currentState.getSymbolTransitions()[currentSymbol]
-        if (nextState != null) {
-            val nextSubsequence = symbols.subList(1, symbols.size)
-            nextResult = getMatchingPrefix(nextSubsequence, nextState)
-            nextResult.prependMatchingSymbol(currentSymbol)
-        }
-        return nextResult
-    }
-
-    private fun getAllMatchResultsFromEmptySymbolTransition(symbols: List<String>, currentState: State): List<MatchResult> {
-        return currentState.getEmptySymbolTransitions()
-                .map { n: State -> getMatchingPrefix(symbols, n) }
+        return start.getLongestMatchingPrefix(symbols)
     }
 
     companion object {
@@ -63,9 +26,9 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newEmptySymbolNFA(): NFA {
-            val start = State()
-            val end = State()
-            start.addEmptySymbolTransition(end)
+            val start = EpsilonTransitionState()
+            val end = EpsilonTransitionState()
+            start.addTransition(end)
             return NFA(start, end)
         }
 
@@ -76,7 +39,7 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newSymbolNFA(symbol: String): NFA {
-            val end = State()
+            val end = EpsilonTransitionState()
             val start = SymbolConsumingState(symbol, end)
             return NFA(start, end)
         }
@@ -89,7 +52,7 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newConcatenateNFA(first: NFA, second: NFA): NFA {
-            first.end.addEmptySymbolTransition(second.start)
+            first.end.addTransition(second.start)
             return NFA(first.start, second.end)
         }
 
@@ -101,12 +64,12 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newUnionNFA(first: NFA, second: NFA): NFA {
-            val start = State()
-            start.addEmptySymbolTransition(first.start)
-            start.addEmptySymbolTransition(second.start)
-            val end = State()
-            first.end.addEmptySymbolTransition(end)
-            second.end.addEmptySymbolTransition(end)
+            val start = EpsilonTransitionState()
+            start.addTransition(first.start)
+            start.addTransition(second.start)
+            val end = EpsilonTransitionState()
+            first.end.addTransition(end)
+            second.end.addTransition(end)
             return NFA(start, end)
         }
 
@@ -117,12 +80,12 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newKleeneClosureNFA(automaton: NFA): NFA {
-            val start = State()
-            val end = State()
-            start.addEmptySymbolTransition(automaton.start)
-            automaton.end.addEmptySymbolTransition(end)
-            automaton.end.addEmptySymbolTransition(automaton.start)
-            start.addEmptySymbolTransition(end)
+            val start = EpsilonTransitionState()
+            val end = EpsilonTransitionState()
+            start.addTransition(automaton.start)
+            automaton.end.addTransition(end)
+            automaton.end.addTransition(automaton.start)
+            start.addTransition(end)
             return NFA(start, end)
         }
 
@@ -133,11 +96,11 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newZeroOrOneNFA(automaton: NFA): NFA {
-            val start = State()
-            val end = State()
-            start.addEmptySymbolTransition(automaton.start)
-            automaton.end.addEmptySymbolTransition(end)
-            start.addEmptySymbolTransition(end)
+            val start = EpsilonTransitionState()
+            val end = EpsilonTransitionState()
+            start.addTransition(automaton.start)
+            automaton.end.addTransition(end)
+            start.addTransition(end)
             return NFA(start, end)
         }
 
