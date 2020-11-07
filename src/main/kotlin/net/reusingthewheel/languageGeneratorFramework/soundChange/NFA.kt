@@ -75,10 +75,10 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @param symbol a symbol necessary to be consumed for the automaton to reach its end state.
          * @return an instance of NFA
          */
-        fun newSymbolNFA(symbol: String?): NFA {
+        fun newSymbolNFA(symbol: String): NFA {
             val start = State()
             val end = State()
-            start.addSymbolTransitions(symbol!!, end)
+            start.addSymbolTransitions(symbol, end)
             return NFA(start, end)
         }
 
