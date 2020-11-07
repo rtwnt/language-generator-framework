@@ -76,9 +76,8 @@ class NFA private constructor(private val start: State, private val end: State) 
          * @return an instance of NFA
          */
         fun newSymbolNFA(symbol: String): NFA {
-            val start = State()
             val end = State()
-            start.addSymbolTransitions(symbol, end)
+            val start = SymbolConsumingState(symbol, end)
             return NFA(start, end)
         }
 

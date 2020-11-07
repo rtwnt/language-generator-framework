@@ -5,23 +5,11 @@ import java.util.*
 /**
  * A state in a finite state automaton.
  */
-internal class State {
-    private val symbolTransitions: MutableMap<String, State>
+open class State {
     private val emptySymbolTransitions: MutableSet<State>
 
     init {
-        symbolTransitions = HashMap()
         emptySymbolTransitions = HashSet()
-    }
-
-    /**
-     * Add a symbol-based transition to another state.
-     *
-     * @param symbol a symbol that needs to be consumed to move from this state to the next state.
-     * @param to the next state for given symbol.
-     */
-    fun addSymbolTransitions(symbol: String, to: State) {
-        symbolTransitions[symbol] = to
     }
 
     /**
@@ -38,11 +26,11 @@ internal class State {
      *
      * @return true if it is a final state.
      */
-    val isFinal: Boolean
-        get() = symbolTransitions.isEmpty() && emptySymbolTransitions.isEmpty()
+    open val isFinal: Boolean
+        get() = emptySymbolTransitions.isEmpty()
 
-    fun getSymbolTransitions(): Map<String, State> {
-        return symbolTransitions
+    open fun getSymbolTransitions(): Map<String, State> {
+        return mapOf()
     }
 
     fun getEmptySymbolTransitions(): Set<State> {
