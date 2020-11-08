@@ -83,9 +83,9 @@ class NFA private constructor(private val start: State, private val end: Epsilon
             val start = EpsilonTransitionState()
             val end = EpsilonTransitionState()
             start.addTransition(automaton.start)
-            automaton.end.addTransition(end)
-            automaton.end.addTransition(automaton.start)
             start.addTransition(end)
+            automaton.end.addTransition(automaton.start)
+            automaton.end.addTransition(end)
             return NFA(start, end)
         }
 
@@ -98,8 +98,8 @@ class NFA private constructor(private val start: State, private val end: Epsilon
         fun newZeroOrOneNFA(automaton: NFA): NFA {
             val start = EpsilonTransitionState()
             val end = EpsilonTransitionState()
-            start.addTransition(end)
             start.addTransition(automaton.start)
+            start.addTransition(end)
             automaton.end.addTransition(end)
             return NFA(start, end)
         }
