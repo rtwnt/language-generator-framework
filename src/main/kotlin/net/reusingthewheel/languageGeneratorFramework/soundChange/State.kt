@@ -11,15 +11,14 @@ abstract class State {
      */
     open val isFinal = false
 
-    fun getLongestMatchingPrefix(symbols: List<String>): MatchResult {
+    fun getFirstMatchingPrefix(symbols: List<String>): MatchResult {
         val result = MatchResult()
         if (isFinal) {
             result.isMatchDetected = true
             return result
         }
         return getMatchResultsForAllPaths(symbols)
-                .filter(MatchResult::isMatchDetected)
-                .maxByOrNull { it.matchedSymbols.size } ?: result
+                .firstOrNull(MatchResult::isMatchDetected) ?: result
     }
 
     abstract fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult>

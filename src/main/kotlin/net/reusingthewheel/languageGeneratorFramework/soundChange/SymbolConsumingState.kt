@@ -14,7 +14,7 @@ class SymbolConsumingState(private val symbol: String, private val nextState: St
         val currentSymbol = symbols[0]
         if (currentSymbol == symbol) {
             val nextSubsequence = symbols.subList(1, symbols.size)
-            nextResult = nextState.getLongestMatchingPrefix(nextSubsequence)
+            nextResult = nextState.getFirstMatchingPrefix(nextSubsequence)
             nextResult.prependMatchingSymbol(currentSymbol)
         }
         return listOf(nextResult)

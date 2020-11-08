@@ -16,7 +16,7 @@ class NFA private constructor(private val start: State, private val end: Epsilon
      */
     fun getMatchingPrefix(symbols: List<String>): MatchResult {
         require(symbols.isNotEmpty()) { "A sequence of symbols cannot be empty" }
-        return start.getLongestMatchingPrefix(symbols)
+        return start.getFirstMatchingPrefix(symbols)
     }
 
     companion object {
@@ -98,9 +98,9 @@ class NFA private constructor(private val start: State, private val end: Epsilon
         fun newZeroOrOneNFA(automaton: NFA): NFA {
             val start = EpsilonTransitionState()
             val end = EpsilonTransitionState()
+            start.addTransition(end)
             start.addTransition(automaton.start)
             automaton.end.addTransition(end)
-            start.addTransition(end)
             return NFA(start, end)
         }
 

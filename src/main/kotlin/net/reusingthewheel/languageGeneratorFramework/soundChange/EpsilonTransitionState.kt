@@ -20,6 +20,6 @@ class EpsilonTransitionState: State() {
     }
 
     override fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult> {
-        return transitions.map { it.getLongestMatchingPrefix(symbols) }
+        return transitions.map { it.getFirstMatchingPrefix(symbols) }
     }
 }
