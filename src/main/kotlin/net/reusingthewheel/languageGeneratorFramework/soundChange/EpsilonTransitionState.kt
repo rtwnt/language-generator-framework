@@ -15,6 +15,10 @@ class EpsilonTransitionState: State() {
         transitions.add(state)
     }
 
+    fun addTransitions(states: List<State>) {
+        states.forEach { addTransition(it) }
+    }
+
     override fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult> {
         return transitions.map { it.getFirstMatchingPrefix(symbols) }
     }
