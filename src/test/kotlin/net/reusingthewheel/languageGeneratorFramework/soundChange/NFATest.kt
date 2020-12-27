@@ -53,6 +53,19 @@ object NFATest: Spek({
                         listOf("x", "a", "a") to expectedMatchResult(true),
                         listOf("x", "b") to expectedMatchResult(true),
                 ),
+                {
+                    NFA.newConcatenateNFA(
+                        NFA.newKleeneClosureNFA(NFA.newSymbolNFA("a"), true),
+                        NFA.newSymbolNFA("x")
+                    )
+                } to "lazyKleeneClosureWithConcatenation" to mapOf(
+                        listOf("a") to expectedMatchResult(false),
+                        listOf("a", "x") to expectedMatchResult(true, listOf("a", "x")),
+                        listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a", "x")),
+                        listOf("x", "a", "x") to expectedMatchResult(true, listOf("x")),
+                        listOf("x", "a", "a") to expectedMatchResult(true, listOf("x")),
+                        listOf("x", "b") to expectedMatchResult(true, listOf("x")),
+                ),
                 { NFA.newZeroOrOneNFA(NFA.newSymbolNFA("a")) } to "zeroOrOne" to mapOf(
                         listOf("a") to expectedMatchResult(true, listOf("a")),
                         listOf("a", "x") to expectedMatchResult(true, listOf("a")),
@@ -60,10 +73,35 @@ object NFATest: Spek({
                         listOf("x", "a", "x") to expectedMatchResult(true),
                         listOf("x", "b", "x") to expectedMatchResult(true),
                 ),
+                {
+                    NFA.newConcatenateNFA(
+                        NFA.newZeroOrOneNFA(NFA.newSymbolNFA("a"), true),
+                        NFA.newSymbolNFA("x")
+                    )
+                } to "lazyZeroOrOneWithConcatenate" to mapOf(
+                        listOf("a") to expectedMatchResult(false),
+                        listOf("a", "x") to expectedMatchResult(true, listOf("a", "x")),
+                        listOf("a", "a", "x") to expectedMatchResult(false),
+                        listOf("x", "a", "x") to expectedMatchResult(true, listOf("x")),
+                        listOf("x", "b", "x") to expectedMatchResult(true, listOf("x")),
+                ),
                 { NFA.newOneOrMoreNFA(NFA.newSymbolNFA("a")) } to "oneOrMore" to mapOf(
                         listOf("a") to expectedMatchResult(true, listOf("a")),
                         listOf("a", "x") to expectedMatchResult(true, listOf("a")),
                         listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a")),
+                        listOf("x", "a", "x") to expectedMatchResult(false),
+                        listOf("x", "a", "a", "x") to expectedMatchResult(false),
+                        listOf("x", "b", "x") to expectedMatchResult(false),
+                ),
+                {
+                    NFA.newConcatenateNFA(
+                            NFA.newOneOrMoreNFA(NFA.newSymbolNFA("a"), true),
+                            NFA.newSymbolNFA("x")
+                    )
+                } to "lazyOneOrMoreWithConcatenate" to mapOf(
+                        listOf("a") to expectedMatchResult(false),
+                        listOf("a", "x") to expectedMatchResult(true, listOf("a", "x")),
+                        listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a", "x")),
                         listOf("x", "a", "x") to expectedMatchResult(false),
                         listOf("x", "a", "a", "x") to expectedMatchResult(false),
                         listOf("x", "b", "x") to expectedMatchResult(false),
