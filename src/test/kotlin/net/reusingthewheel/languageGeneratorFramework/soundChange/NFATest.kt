@@ -13,7 +13,8 @@ fun expectedMatchResult(matchDetected: Boolean, matchedSymbols: List<String> = l
     return result
 }
 
-class NFAInstanceTestSetup(private val toTest: () -> NFA, val name: String, val inputToExpectedMatchResult: Map<List<String>, MatchResult>) {
+class NFAInstanceTestSetup(
+        private val toTest: () -> NFA, val name: String, val inputToExpectedMatchResult: Map<List<String>, MatchResult>) {
     fun assertThrowsIllegalArgumentException() {
         Assertions.assertThatThrownBy { toTest().getMatchingPrefix(listOf()) }.isInstanceOf(IllegalArgumentException::class.java)
     }
@@ -72,33 +73,6 @@ object NFATest: Spek({
                         )
                 ),
                 NFAInstanceTestSetup(
-                        { NFA.newKleeneClosureNFA(NFA.newSymbolNFA("a")) },
-                        "kleeneClosure",
-                        mapOf(
-                                listOf("a") to expectedMatchResult(true, listOf("a")),
-                                listOf("a", "x") to expectedMatchResult(true, listOf("a")),
-                                listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a")),
-                                listOf("x", "a", "x") to expectedMatchResult(true),
-                                listOf("x", "a", "a") to expectedMatchResult(true),
-                                listOf("x", "b") to expectedMatchResult(true),
-                        )
-                ),
-                NFAInstanceTestSetup(
-                        { NFA.newConcatenateNFA(
-                                NFA.newKleeneClosureNFA(NFA.newSymbolNFA("a"), true),
-                                NFA.newSymbolNFA("x")
-                        ) },
-                        "lazyKleeneClosureWithConcatenation",
-                        mapOf(
-                                listOf("a") to expectedMatchResult(false),
-                                listOf("a", "x") to expectedMatchResult(true, listOf("a", "x")),
-                                listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a", "x")),
-                                listOf("x", "a", "x") to expectedMatchResult(true, listOf("x")),
-                                listOf("x", "a", "a") to expectedMatchResult(true, listOf("x")),
-                                listOf("x", "b") to expectedMatchResult(true, listOf("x")),
-                        )
-                ),
-                NFAInstanceTestSetup(
                         { NFA.newZeroOrOneNFA(NFA.newSymbolNFA("a")) },
                         "zeroOrOne",
                         mapOf(
@@ -121,33 +95,6 @@ object NFATest: Spek({
                                 listOf("a", "a", "x") to expectedMatchResult(false),
                                 listOf("x", "a", "x") to expectedMatchResult(true, listOf("x")),
                                 listOf("x", "b", "x") to expectedMatchResult(true, listOf("x")),
-                        )
-                ),
-                NFAInstanceTestSetup(
-                        { NFA.newOneOrMoreNFA(NFA.newSymbolNFA("a")) },
-                        "oneOrMore",
-                        mapOf(
-                                listOf("a") to expectedMatchResult(true, listOf("a")),
-                                listOf("a", "x") to expectedMatchResult(true, listOf("a")),
-                                listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a")),
-                                listOf("x", "a", "x") to expectedMatchResult(false),
-                                listOf("x", "a", "a", "x") to expectedMatchResult(false),
-                                listOf("x", "b", "x") to expectedMatchResult(false),
-                        )
-                ),
-                NFAInstanceTestSetup(
-                        { NFA.newConcatenateNFA(
-                                NFA.newOneOrMoreNFA(NFA.newSymbolNFA("a"), true),
-                                NFA.newSymbolNFA("x")
-                        ) },
-                        "lazyOneOrMoreWithConcatenate",
-                        mapOf(
-                                listOf("a") to expectedMatchResult(false),
-                                listOf("a", "x") to expectedMatchResult(true, listOf("a", "x")),
-                                listOf("a", "a", "x") to expectedMatchResult(true, listOf("a", "a", "x")),
-                                listOf("x", "a", "x") to expectedMatchResult(false),
-                                listOf("x", "a", "a", "x") to expectedMatchResult(false),
-                                listOf("x", "b", "x") to expectedMatchResult(false),
                         )
                 )
         )

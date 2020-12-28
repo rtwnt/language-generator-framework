@@ -74,24 +74,6 @@ class NFA private constructor(private val start: State, private val end: Epsilon
         }
 
         /**
-         * Create an automaton that reaches its final state if the given automaton does it 0 or more times.
-         *
-         * @param automaton the given automaton
-         * @param isLazy if true, the resulting automaton matches as short a sequence of symbols as possible to
-         * detect a match.
-         * @return an instance of NFA
-         */
-        fun newKleeneClosureNFA(automaton: NFA, isLazy: Boolean = false): NFA {
-            val start = EpsilonTransitionState()
-            val end = EpsilonTransitionState()
-            val fromStart = reverseIfTrue(listOf(automaton.start, end), isLazy)
-            start.addTransitions(fromStart)
-            automaton.end.addTransition(automaton.start)
-            automaton.end.addTransition(end)
-            return NFA(start, end)
-        }
-
-        /**
          * Create an automaton that reaches its final state if the given automaton does it 0 or 1 time.
          *
          * @param automaton the given automaton
@@ -114,18 +96,6 @@ class NFA private constructor(private val start: State, private val end: Epsilon
             start.addTransitions(listOf(end, automaton.start))
             automaton.end.addTransition(end)
             return NFA(start, end)
-        }
-
-        /**
-         * Create an automaton that reaches its final state if the given automaton does it once or more.
-         *
-         * @param automaton the given automaton
-         * @param isLazy if true, the resulting automaton matches as short a sequence of symbols as possible to
-         * detect a match.
-         * @return an instance of NFA
-         */
-        fun newOneOrMoreNFA(automaton: NFA, isLazy: Boolean = false): NFA {
-            return newConcatenateNFA(automaton, newKleeneClosureNFA(automaton, isLazy))
         }
 
         private fun reverseIfTrue(states: List<State>, shouldBeReversed: Boolean): List<State> {
