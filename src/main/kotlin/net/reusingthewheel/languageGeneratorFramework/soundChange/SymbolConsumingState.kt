@@ -19,4 +19,13 @@ class SymbolConsumingState(private val symbol: String, private val nextState: St
         }
         return listOf(nextResult)
     }
+
+    override fun generateAllSymbolSequnecesMatchingThisAndFollowingStates(): List<List<String>> {
+        return nextState.generateAllMatchingSymbolSequences()
+                .map {
+                    val result = it.toMutableList()
+                    result.add(0, symbol)
+                    result
+                }
+    }
 }

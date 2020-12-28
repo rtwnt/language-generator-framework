@@ -14,13 +14,22 @@ fun expectedMatchResult(matchDetected: Boolean, matchedSymbols: List<String> = l
 }
 
 class NFAInstanceTestSetup(
-        private val toTest: () -> NFA, val name: String, val inputToExpectedMatchResult: Map<List<String>, MatchResult>) {
+        private val toTest: () -> NFA,
+        val name: String,
+        val inputToExpectedMatchResult: Map<List<String>, MatchResult>,
+        private val expectedResultOfGenerateAllMatchingSequences: List<List<String>>
+) {
     fun assertThrowsIllegalArgumentException() {
         Assertions.assertThatThrownBy { toTest().getMatchingPrefix(listOf()) }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
     fun assertGetMatchingPrefixReturnsExpectedResult(symbols: List<String>, expected: MatchResult) {
         Assertions.assertThat(toTest().getMatchingPrefix(symbols)).usingRecursiveComparison().isEqualTo(expected)
+    }
+
+    fun assertGenerateAllMatchingSequencesReturnsExpectedResults() {
+        Assertions.assertThat(toTest().generateAllMatchingSymbolSequences())
+                .containsExactlyInAnyOrderElementsOf(expectedResultOfGenerateAllMatchingSequences)
     }
 }
 
@@ -34,7 +43,8 @@ object NFATest: Spek({
                                 listOf("a") to expectedMatchResult(true),
                                 listOf("a", "x") to expectedMatchResult(true),
                                 listOf("x", "a") to expectedMatchResult(true),
-                        )
+                        ),
+                        listOf(listOf())
                 ),
                 NFAInstanceTestSetup(
                         { NFA.newSymbolNFA("a") },
@@ -44,7 +54,8 @@ object NFATest: Spek({
                                 listOf("b") to expectedMatchResult(false),
                                 listOf("a", "b") to expectedMatchResult(true, listOf("a")),
                                 listOf("b", "a") to expectedMatchResult(false),
-                        )
+                        ),
+                        listOf(listOf("a"))
                 ),
                 NFAInstanceTestSetup(
                         { NFA.newConcatenateNFA(NFA.newSymbolNFA("a"), NFA.newSymbolNFA("b")) },
@@ -56,7 +67,8 @@ object NFATest: Spek({
                                 listOf("b", "a") to expectedMatchResult(false),
                                 listOf("a", "b", "x") to expectedMatchResult(true, listOf("a", "b")),
                                 listOf("x", "a", "b", "x") to expectedMatchResult(false),
-                        )
+                        ),
+                        listOf(listOf("a", "b"))
                 ),
                 NFAInstanceTestSetup(
                         { NFA.newUnionNFA(NFA.newSymbolNFA("a"), NFA.newSymbolNFA("b")) },
@@ -70,7 +82,8 @@ object NFATest: Spek({
                                 listOf("b", "x") to expectedMatchResult(true, listOf("b")),
                                 listOf("x", "a") to expectedMatchResult(false),
                                 listOf("x", "b") to expectedMatchResult(false),
-                        )
+                        ),
+                        listOf(listOf("a"), listOf("b"))
                 ),
                 NFAInstanceTestSetup(
                         { NFA.newZeroOrOneNFA(NFA.newSymbolNFA("a")) },
@@ -81,7 +94,8 @@ object NFATest: Spek({
                                 listOf("a", "a", "x") to expectedMatchResult(true, listOf("a")),
                                 listOf("x", "a", "x") to expectedMatchResult(true),
                                 listOf("x", "b", "x") to expectedMatchResult(true),
-                        )
+                        ),
+                        listOf(listOf(), listOf("a"))
                 ),
                 NFAInstanceTestSetup(
                         { NFA.newConcatenateNFA(
@@ -95,13 +109,14 @@ object NFATest: Spek({
                                 listOf("a", "a", "x") to expectedMatchResult(false),
                                 listOf("x", "a", "x") to expectedMatchResult(true, listOf("x")),
                                 listOf("x", "b", "x") to expectedMatchResult(true, listOf("x")),
-                        )
+                        ),
+                        listOf(listOf("x"), listOf("a", "x"))
                 )
         )
 
-        describe("getMatchingPrefix method") {
-            setup.forEach { nfaSetup ->
-                describe("called on ${nfaSetup.name}") {
+        setup.forEach { nfaSetup ->
+            describe("For ${nfaSetup.name}") {
+                describe("getMatchingPregix method") {
                     it("throws IllegalArgumentException when given an empty sequence of symbols") {
                         nfaSetup.assertThrowsIllegalArgumentException()
                     }
@@ -112,6 +127,12 @@ object NFATest: Spek({
                                 "a sequence of symbols = $symbols") {
                             nfaSetup.assertGetMatchingPrefixReturnsExpectedResult(symbols, expected)
                         }
+                    }
+                }
+
+                describe("generateAllMatchingSymbolSequences method") {
+                    it("returns all matching symbol sequences") {
+                        nfaSetup.assertGenerateAllMatchingSequencesReturnsExpectedResults()
                     }
                 }
             }

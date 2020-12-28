@@ -19,6 +19,15 @@ class NFA private constructor(private val start: State, private val end: Epsilon
         return start.getFirstMatchingPrefix(symbols)
     }
 
+    /**
+     * Generate all sequences of symbols such as this NFA reaches its final state after consuming all symbols
+     * in the sequence
+     * @return list of the matching sequences as lists of symbols
+     */
+    fun generateAllMatchingSymbolSequences(): List<List<String>> {
+        return start.generateAllMatchingSymbolSequences()
+    }
+
     companion object {
         /**
          * Create an automaton that allows for a transition without consuming any symbol.

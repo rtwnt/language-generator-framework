@@ -22,4 +22,8 @@ class EpsilonTransitionState: State() {
     override fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult> {
         return transitions.map { it.getFirstMatchingPrefix(symbols) }
     }
+
+    override fun generateAllSymbolSequnecesMatchingThisAndFollowingStates(): List<List<String>> {
+        return transitions.flatMap { it.generateAllMatchingSymbolSequences() }
+    }
 }
