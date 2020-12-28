@@ -90,14 +90,6 @@ class NFA private constructor(private val start: State, private val end: Epsilon
             return NFA(start, end)
         }
 
-        fun newLazy(automaton: NFA): NFA {
-            val start = EpsilonTransitionState()
-            val end = EpsilonTransitionState()
-            start.addTransitions(listOf(end, automaton.start))
-            automaton.end.addTransition(end)
-            return NFA(start, end)
-        }
-
         private fun reverseIfTrue(states: List<State>, shouldBeReversed: Boolean): List<State> {
             if(shouldBeReversed) {
                 return states.reversed()
