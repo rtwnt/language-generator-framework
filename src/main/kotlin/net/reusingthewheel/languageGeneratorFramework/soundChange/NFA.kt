@@ -16,7 +16,7 @@ class NFA private constructor(private val start: State, private val end: Epsilon
      */
     fun getMatchingPrefix(symbols: List<String>): MatchResult {
         require(symbols.isNotEmpty()) { "A sequence of symbols cannot be empty" }
-        return start.getFirstMatchingPrefix(symbols)
+        return start.getFirstMatchingPrefix(symbols, 0)
     }
 
     /**

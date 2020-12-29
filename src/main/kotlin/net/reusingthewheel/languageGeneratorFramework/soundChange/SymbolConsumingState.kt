@@ -6,15 +6,11 @@ package net.reusingthewheel.languageGeneratorFramework.soundChange
 class SymbolConsumingState(private val symbol: String, private val nextState: State) : State() {
     override val isFinal = false
 
-    override fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult> {
+    override fun getMatchResultsForAllPaths(symbols: List<String>, currentIndex: Int): List<MatchResult> {
         var nextResult = MatchResult()
-        if (symbols.isEmpty()) {
-            return listOf(nextResult)
-        }
-        val currentSymbol = symbols[0]
+        val currentSymbol = symbols.getOrNull(currentIndex) ?: return listOf(nextResult)
         if (currentSymbol == symbol) {
-            val nextSubsequence = symbols.subList(1, symbols.size)
-            nextResult = nextState.getFirstMatchingPrefix(nextSubsequence)
+            nextResult = nextState.getFirstMatchingPrefix(symbols, currentIndex + 1)
             nextResult.prependMatchingSymbol(currentSymbol)
         }
         return listOf(nextResult)

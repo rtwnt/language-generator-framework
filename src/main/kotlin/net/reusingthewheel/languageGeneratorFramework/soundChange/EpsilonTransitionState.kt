@@ -19,8 +19,8 @@ class EpsilonTransitionState: State() {
         states.forEach { addTransition(it) }
     }
 
-    override fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult> {
-        return transitions.map { it.getFirstMatchingPrefix(symbols) }
+    override fun getMatchResultsForAllPaths(symbols: List<String>, currentIndex: Int): List<MatchResult> {
+        return transitions.map { it.getFirstMatchingPrefix(symbols, currentIndex) }
     }
 
     override fun generateAllSymbolSequnecesMatchingThisAndFollowingStates(): List<List<String>> {

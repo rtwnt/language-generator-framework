@@ -11,13 +11,13 @@ abstract class State {
      */
     open val isFinal = false
 
-    fun getFirstMatchingPrefix(symbols: List<String>): MatchResult {
+    fun getFirstMatchingPrefix(symbols: List<String>, currentIndex: Int): MatchResult {
         val result = MatchResult()
         if (isFinal) {
             result.isMatchDetected = true
             return result
         }
-        return getMatchResultsForAllPaths(symbols)
+        return getMatchResultsForAllPaths(symbols, currentIndex)
                 .firstOrNull(MatchResult::isMatchDetected) ?: result
     }
 
@@ -29,7 +29,7 @@ abstract class State {
         return generateAllSymbolSequnecesMatchingThisAndFollowingStates()
     }
 
-    abstract fun getMatchResultsForAllPaths(symbols: List<String>): List<MatchResult>
+    abstract fun getMatchResultsForAllPaths(symbols: List<String>, currentIndex: Int): List<MatchResult>
 
     abstract fun generateAllSymbolSequnecesMatchingThisAndFollowingStates(): List<List<String>>
 }
