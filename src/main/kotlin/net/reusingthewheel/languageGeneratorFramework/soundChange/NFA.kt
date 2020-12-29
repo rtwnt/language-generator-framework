@@ -99,6 +99,20 @@ class NFA private constructor(private val start: State, private val end: Epsilon
             return NFA(start, end)
         }
 
+        /**
+         * Create an automaton that captures indexes before and after given automaton.
+         *
+         * @param automaton the given automaton
+         * @return an instance of NFA
+         */
+        fun newIndexCapturingGroup(automaton: NFA): NFA {
+            val start = EpsilonTransitionState(true)
+            val end = EpsilonTransitionState(true)
+            start.addTransitions(listOf(automaton.start))
+            automaton.end.addTransition(end)
+            return NFA(start, end)
+        }
+
         private fun reverseIfTrue(states: List<State>, shouldBeReversed: Boolean): List<State> {
             if(shouldBeReversed) {
                 return states.reversed()

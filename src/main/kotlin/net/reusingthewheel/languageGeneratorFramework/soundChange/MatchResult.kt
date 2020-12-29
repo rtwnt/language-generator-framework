@@ -7,6 +7,7 @@ package net.reusingthewheel.languageGeneratorFramework.soundChange
 class MatchResult {
     var isMatchDetected = false
     val matchedSymbols = mutableListOf<String>()
+    val capturedIndexes = mutableListOf<Int>()
     fun prependMatchingSymbol(symbol: String) {
         matchedSymbols.add(0, symbol)
     }

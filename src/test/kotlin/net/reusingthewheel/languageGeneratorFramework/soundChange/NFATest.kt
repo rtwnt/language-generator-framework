@@ -6,10 +6,11 @@ import org.spekframework.spek2.style.specification.describe
 import java.lang.IllegalArgumentException
 
 
-fun expectedMatchResult(matchDetected: Boolean, matchedSymbols: List<String> = listOf()): MatchResult {
+fun expectedMatchResult(matchDetected: Boolean, matchedSymbols: List<String> = listOf(), capturedIndexes: List<Int> = listOf()): MatchResult {
     val result = MatchResult()
     result.isMatchDetected = matchDetected
     result.matchedSymbols.addAll(matchedSymbols)
+    result.capturedIndexes.addAll(capturedIndexes)
     return result
 }
 
@@ -111,6 +112,19 @@ object NFATest: Spek({
                                 listOf("x", "b", "x") to expectedMatchResult(true, listOf("x")),
                         ),
                         listOf(listOf("x"), listOf("a", "x"))
+                ),
+                NFAInstanceTestSetup(
+                        {
+                            val captured = NFA.newConcatenateNFA(NFA.newSymbolNFA("b"), NFA.newSymbolNFA("c"))
+                            val capturingGroup = NFA.newIndexCapturingGroup(captured)
+                            val concatenateLeft = NFA.newConcatenateNFA(NFA.newSymbolNFA("a"), capturingGroup)
+                            NFA.newConcatenateNFA(concatenateLeft, NFA.newSymbolNFA("d"))
+                        },
+                        "concatenateWithCapturingIndexes",
+                        mapOf(
+                                listOf("a", "b", "c", "d") to expectedMatchResult(true, listOf("a", "b", "c", "d"), listOf(3, 1)),
+                        ),
+                        listOf(listOf("a", "b", "c", "d"))
                 )
         )
 

@@ -5,7 +5,7 @@ import java.util.HashSet
 /**
  * A state that provides transitions to other states without consuming a symbol.
  */
-class EpsilonTransitionState: State() {
+class EpsilonTransitionState(private val captureIndexes: Boolean = false): State() {
     private val transitions = mutableListOf<State>()
 
     override val isFinal: Boolean
@@ -20,7 +20,11 @@ class EpsilonTransitionState: State() {
     }
 
     override fun getMatchResultsForAllPaths(symbols: List<String>, currentIndex: Int): List<MatchResult> {
-        return transitions.map { it.getFirstMatchingPrefix(symbols, currentIndex) }
+        val result = transitions.map { it.getFirstMatchingPrefix(symbols, currentIndex) }
+        if (captureIndexes) {
+            result.map { it.capturedIndexes.add(currentIndex) }
+        }
+        return result
     }
 
     override fun generateAllSymbolSequnecesMatchingThisAndFollowingStates(): List<List<String>> {
