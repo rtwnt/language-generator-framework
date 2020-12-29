@@ -1,7 +1,5 @@
 package net.reusingthewheel.languageGeneratorFramework.soundChange
 
-import java.util.HashSet
-
 /**
  * A state that provides transitions to other states without consuming a symbol.
  */
@@ -20,7 +18,7 @@ class EpsilonTransitionState(private val captureIndexes: Boolean = false): State
     }
 
     override fun getMatchResultsForAllPaths(symbols: List<String>, currentIndex: Int): List<MatchResult> {
-        val result = transitions.map { it.getFirstMatchingPrefix(symbols, currentIndex) }
+        val result = transitions.map { it.getFirstMatch(symbols, currentIndex) }
         if (captureIndexes) {
             result.map { it.capturedIndexes.add(currentIndex) }
         }

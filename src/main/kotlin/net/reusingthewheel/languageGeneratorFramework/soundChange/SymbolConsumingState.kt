@@ -10,7 +10,7 @@ class SymbolConsumingState(private val symbol: String, private val nextState: St
         var nextResult = MatchResult()
         val currentSymbol = symbols.getOrNull(currentIndex) ?: return listOf(nextResult)
         if (currentSymbol == symbol) {
-            nextResult = nextState.getFirstMatchingPrefix(symbols, currentIndex + 1)
+            nextResult = nextState.getFirstMatch(symbols, currentIndex + 1)
             nextResult.prependMatchingSymbol(currentSymbol)
         }
         return listOf(nextResult)

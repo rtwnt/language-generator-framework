@@ -11,7 +11,7 @@ abstract class State {
      */
     open val isFinal = false
 
-    fun getFirstMatchingPrefix(symbols: List<String>, currentIndex: Int): MatchResult {
+    fun getFirstMatch(symbols: List<String>, currentIndex: Int): MatchResult {
         val result = MatchResult()
         if (isFinal) {
             result.isMatchDetected = true

@@ -7,16 +7,33 @@ package net.reusingthewheel.languageGeneratorFramework.soundChange
 class NFA private constructor(private val start: State, private val end: EpsilonTransitionState) {
 
     /**
-     * Get the subsequence of given sequence of symbols starting from the beginning of given sequence
-     * such as the automaton reaches it's final state after consuming the subsequence.
+     * Find all subsequences matching this NFA in given sequence of symbols and capture starting
+     * and ending indexes of capturing groups specified in NFA
      *
      * @param symbols a list of symbols.
-     * @return MatchResult with information on whether the final state has been reached and the subsequence
-     * of symbols consumed in the process.
+     * @return MatchResult with information on whether the final state has been reached, the subsequence
+     * of symbols consumed in the process and a list of captured indexes
      */
-    fun getMatchingPrefix(symbols: List<String>): MatchResult {
+    fun findAllMatchingSubsequencesAndCapturedIndexes(symbols: List<String>): MatchResult {
         require(symbols.isNotEmpty()) { "A sequence of symbols cannot be empty" }
-        return start.getFirstMatchingPrefix(symbols, 0)
+        var lastIndex = 0
+        val allMatchResults = mutableListOf<MatchResult>()
+        while (lastIndex < symbols.size) {
+            val matchResult = start.getFirstMatch(symbols, lastIndex)
+            if (matchResult.isMatchDetected) {
+                allMatchResults.add(matchResult)
+                lastIndex = matchResult.capturedIndexes.getOrElse(0) { lastIndex + 1 }
+            } else {
+                lastIndex += 1;
+            }
+        }
+        val finalResult = MatchResult()
+        if (allMatchResults.isNotEmpty()) {
+            finalResult.isMatchDetected = true
+            finalResult.capturedIndexes.addAll(allMatchResults.map { it.capturedIndexes }.flatten())
+            finalResult.matchedSymbols.addAll(allMatchResults.map { it.matchedSymbols }.flatten())
+        }
+        return finalResult
     }
 
     /**
